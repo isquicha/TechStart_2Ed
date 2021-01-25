@@ -23,7 +23,7 @@ Este repositório contém um problema usado para avaliar as habilidades do candi
 
 
 # Especificação
-Você deve implementar um aplicativo para armazenar dados de vendedores, produtos ,marketplaces e categorias.
+Você deve implementar um aplicativo para armazenar dados de vendedores, produtos, marketplaces e categorias.
 
 1. CRUD (criar, ler, atualizar e excluir) de vendedores:
 2. CRUD (criar, ler, atualizar e excluir) de produtos:
@@ -43,7 +43,7 @@ Cada registro de vendedor deve conter as seguintes informações:
 * cnpj
 * email de contato
 * telefone de contato
-* endereco completo
+* endereço completo
 
 Cada registro de produto deve conter as seguintes informações:
 * id (autogerado)
@@ -71,11 +71,12 @@ Para recuperar um produto, podemos filtrar por 4 campos (ou uma composição des
 * descrição
 * valor
 * categorias
+
 Deve ser possível navegar pelos dados de todos os produtos sem nenhum filtro.
 
 
 # Requisitos do projeto:
-1. Pode ser feita em qualquer linguagem de programação que suporte o paradigma de orientação a objetos
+1. Pode ser feito em qualquer linguagem de programação que suporte o paradigma de orientação a objetos
 2. Utilizar padrões de projeto
 3. Boas práticas de desenvolvimento de software
 4. Utilizar paradigma de orientação a objetos
