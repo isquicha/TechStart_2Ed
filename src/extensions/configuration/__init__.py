@@ -95,7 +95,11 @@ def load_extensions(app: Flask) -> bool:
                 module_name = extension
                 factory = "init_app"
 
-            module = import_module(extensions_path + "." + module_name)
+            try:
+                module = import_module(extensions_path + "." + module_name)
+            except ImportError:
+                module = import_module(module_name)
+
             module_create = getattr(module, factory)
             module_create(app)
 
