@@ -46,7 +46,7 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
 
     # ? Many to many relationship
-    categories = db.Relationship(
+    categories = db.relationship(
         "Category",
         secondary=products_categories,
         backref=db.backref("products", lazy=True),
