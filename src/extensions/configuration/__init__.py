@@ -55,7 +55,11 @@ def load_configuration(app: Flask) -> bool:
 
     def _load_configuration(env):
         for key, value in config[env].items():
-            app.config[key] = value
+            env_value = os.environ.get(key)
+            if env_value:
+                app.config[key] = env_value
+            else:
+                app.config[key] = value
 
     _load_configuration("DEFAULT")
     if env:
