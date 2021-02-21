@@ -227,16 +227,96 @@ class ProductAPI(MethodView):
 
 class CategoryAPI(MethodView):
     def get(self, category_id):
-        pass
+        if category_id is None:
+            categories = []
+
+            for category in Category.query.all():
+                categories.append(
+                    {
+                        "id": category.id,
+                        "name": category.name,
+                        "description": category.description,
+                    }
+                )
+
+            return jsonify(categories)
+
+        category = Category.query.get(category_id)
+        if category is None:
+            return {"ERROR": "Category does not exists"}, 400
+
+        return jsonify(
+            {
+                "id": category.id,
+                "name": category.name,
+                "description": category.description,
+                "products": [
+                    {
+                        "id": product.id,
+                        "name": product.name,
+                    }
+                    for product in category.products
+                ],
+            }
+        )
 
     def post(self):
-        pass
+        body = request.get_json()
+
+        name = body.get("name", None)
+        description = body.get("description", None)
+        products = body.get("products", None)
+
+        if name is None:
+            return {"ERROR": "Field 'name' must not be empty"}, 400
+        if description is None:
+            return {"ERROR": "Field 'description' must not be empty"}, 400
+
+        errors = []
+        products_list = []
+        if products is not None:
+            for product in products:
+                product_to_add = Product.query.get(product)
+                if product_to_add is not None:
+                    products_list.append(product_to_add)
+                else:
+                    errors.append(
+                        f"Product '{product}' not found. "
+                        "Creating category without it"
+                    )
+
+        category = Category(
+            name=name,
+            description=description,
+        )
+
+        for product in products_list:
+            category.products.append(product)
+
+        try:
+            db.session.add(category)
+            db.session.commit()
+        except Exception:
+            return {"ERROR": "Category could not be created"}, 500
+
+        if len(errors) > 0:
+            return {
+                "id": category.id,
+                "name": category.name,
+                "description": category.description,
+                "errors": errors,
+            }
+        return {
+            "id": category.id,
+            "name": category.name,
+            "description": category.description,
+        }
 
     def put(self, category_id):
-        pass
+        return {"ERROR": "Not implemented"}, 501
 
     def delete(self, category_id):
-        pass
+        return {"ERROR": "Not implemented"}, 501
 
 
 class MarketplaceAPI(MethodView):
