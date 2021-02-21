@@ -5,7 +5,20 @@ This project is a programming challenge for an interview at [Olist](https://gith
 
 It's basically a CRUD with 4 tables (Products, Categories, Sellers, Marketplaces). To do so, I made an API with Python's web framework Flask.
 
+### Files and folder structure
+- [settings.py](settings.py) is responsible for the project's settings, with includes configuration variables, extensions and blueprints.
+- `migrations` folder is a database migrations folder created and managed by flask-migrate extension
+- `requirements` folder contains the project's requirement files
+    - [com.txt](com.txt) have the common dependencies and must be installed
+    - [dev.txt](dev.txt) have the development dependencies
+    - [prod.txt](prod.txt) have the production dependencies
+    - [test.txt](test.txt) have the test dependencies
+- `server` folder is a set of scripts to help me put the project on a production server
+- `src` folder contains the application itself
+    - `app` folder contains the flask app creation and initialization
+    - `blueprints` folder contains the application's business rules
 
+TODO: Finish topic
 
 
 ## Installation
