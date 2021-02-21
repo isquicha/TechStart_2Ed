@@ -2,7 +2,7 @@ from flask import jsonify, request
 from flask.views import MethodView
 
 from src.extensions.database import db
-from src.models.marketplace import Seller
+from src.models.marketplace import Seller, Product, Category
 
 
 class SellerAPI(MethodView):
@@ -59,6 +59,11 @@ class SellerAPI(MethodView):
             return {"ERROR": "Field 'phone' must not be empty"}, 400
         if address is None:
             return {"ERROR": "Field 'address' must not be empty"}, 400
+
+        if Seller.query.filter_by(company_name=company_name).first():
+            return {"ERROR": "Company name already registered"}, 400
+        if Seller.query.filter_by(tax_code=tax_code).first():
+            return {"ERROR": "Company tax code already registered"}, 400
 
         seller = Seller(
             fantasy_name=fantasy_name,
@@ -128,16 +133,96 @@ class SellerAPI(MethodView):
 
 class ProductAPI(MethodView):
     def get(self, product_id):
-        pass
+        if product_id is None:
+            products = []
+
+            for product in Product.query.all():
+                products.append(
+                    {
+                        "id": product.id,
+                        "name": product.name,
+                        "price": product.price,
+                    }
+                )
+
+            return jsonify(products)
+
+        product = Product.query.get(product_id)
+        if product is None:
+            return {"ERROR": "Product does not exists"}, 400
+
+        return jsonify(
+            {
+                "id": product.id,
+                "name": product.name,
+                "price": product.price,
+                "description": product.description,
+                "categories": product.categories,
+            }
+        )
 
     def post(self):
-        pass
+        body = request.get_json()
+
+        name = body.get("name", None)
+        price = body.get("price", None)
+        description = body.get("description", None)
+        categories = body.get("categories", None)
+
+        if name is None:
+            return {"ERROR": "Field 'name' must not be empty"}, 400
+        if price is None:
+            return {"ERROR": "Field 'price' must not be empty"}, 400
+        if description is None:
+            return {"ERROR": "Field 'description' must not be empty"}, 400
+
+        try:
+            price = float(price)
+        except ValueError:
+            return {"ERROR": "Field 'price' must be a float"}, 400
+
+        errors = []
+        categories_list = []
+        if categories is not None:
+            for category in categories:
+                category_to_add = Category.query.get(category)
+                if category_to_add is not None:
+                    categories_list.append(category_to_add)
+                else:
+                    errors.append(
+                        f"Category '{category}' not found. "
+                        "Creating product without it"
+                    )
+
+        product = Product(
+            name=name,
+            price=price,
+            description=description,
+        )
+
+        for category in categories_list:
+            product.categories.append(category)
+
+        try:
+            db.session.add(product)
+            db.session.commit()
+        except Exception:
+            return {"ERROR": "Product could not be created"}, 500
+
+        if len(errors) > 0:
+            return {
+                "id": product.id,
+                "name": product.name,
+                "price": product.price,
+                "errors": errors,
+            }
+        return {"id": product.id, "name": product.name, "price": product.price}
 
     def put(self, product_id):
-        pass
+        return {"ERROR": "Not implemented"}, 501
 
     def delete(self, product_id):
-        pass
+        return {"ERROR": "Not implemented"}, 501
 
 
 class CategoryAPI(MethodView):
