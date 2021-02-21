@@ -47,3 +47,21 @@ def init_app(bp):
         view_func=product_view,
         methods=["GET", "PUT", "DELETE"],
     )
+
+    # * Categories
+    bp.add_url_rule(
+        "/categories/",
+        defaults={"category_id": None},
+        view_func=category_view,
+        methods=["GET"],
+    )
+    bp.add_url_rule(
+        "/categories/",
+        view_func=category_view,
+        methods=["POST"],
+    )
+    bp.add_url_rule(
+        "/categories/<int:category_id>",
+        view_func=category_view,
+        methods=["GET", "PUT", "DELETE"],
+    )
