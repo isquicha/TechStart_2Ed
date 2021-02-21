@@ -49,7 +49,7 @@ extensions = {
     "DEFAULT": [
         "database",
         "authentication",
-        "commands",
+        # "commands",
         # "admin",
         # "language",
     ],
