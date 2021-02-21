@@ -2,7 +2,7 @@ server {
     listen  80;
     server_name olisttechstart.andrevicente.dev.br;
 
-    localtion /static {
+    location /static {
         alias /home/isquicha/projetos/techstart_2ed/src/static;
     }
 
