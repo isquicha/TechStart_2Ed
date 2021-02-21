@@ -29,3 +29,21 @@ def init_app(bp):
         view_func=seller_view,
         methods=["GET", "PUT", "DELETE"],
     )
+
+    # * Products
+    bp.add_url_rule(
+        "/products/",
+        defaults={"product_id": None},
+        view_func=product_view,
+        methods=["GET"],
+    )
+    bp.add_url_rule(
+        "/products/",
+        view_func=product_view,
+        methods=["POST"],
+    )
+    bp.add_url_rule(
+        "/products/<int:product_id>",
+        view_func=product_view,
+        methods=["GET", "PUT", "DELETE"],
+    )
