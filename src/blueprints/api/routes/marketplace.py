@@ -65,3 +65,21 @@ def init_app(bp):
         view_func=category_view,
         methods=["GET", "PUT", "DELETE"],
     )
+
+    # * Marketplaces
+    bp.add_url_rule(
+        "/marketplaces/",
+        defaults={"marketplace_id": None},
+        view_func=marketplace_view,
+        methods=["GET"],
+    )
+    bp.add_url_rule(
+        "/marketplaces/",
+        view_func=marketplace_view,
+        methods=["POST"],
+    )
+    bp.add_url_rule(
+        "/marketplaces/<int:marketplace_id>",
+        view_func=marketplace_view,
+        methods=["GET", "PUT", "DELETE"],
+    )
