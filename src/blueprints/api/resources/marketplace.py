@@ -23,7 +23,7 @@ class SellerAPI(MethodView):
 
         seller = Seller.query.get(seller_id)
         if seller is None:
-            return {"ERROR": "Seller does not exists"}
+            return {"ERROR": "Seller does not exists"}, 400
 
         return jsonify(
             {
@@ -48,17 +48,17 @@ class SellerAPI(MethodView):
         address = body.get("address", None)
 
         if fantasy_name is None:
-            return {"ERROR": "Field 'fantasy_name' must not be empty"}
+            return {"ERROR": "Field 'fantasy_name' must not be empty"}, 400
         if company_name is None:
-            return {"ERROR": "Field 'company_name' must not be empty"}
+            return {"ERROR": "Field 'company_name' must not be empty"}, 400
         if tax_code is None:
-            return {"ERROR": "Field 'tax_code' must not be empty"}
+            return {"ERROR": "Field 'tax_code' must not be empty"}, 400
         if email is None:
-            return {"ERROR": "Field 'email' must not be empty"}
+            return {"ERROR": "Field 'email' must not be empty"}, 400
         if phone is None:
-            return {"ERROR": "Field 'phone' must not be empty"}
+            return {"ERROR": "Field 'phone' must not be empty"}, 400
         if address is None:
-            return {"ERROR": "Field 'address' must not be empty"}
+            return {"ERROR": "Field 'address' must not be empty"}, 400
 
         seller = Seller(
             fantasy_name=fantasy_name,
@@ -73,14 +73,14 @@ class SellerAPI(MethodView):
             db.session.add(seller)
             db.session.commit()
         except Exception:
-            return {"ERROR": "Seller could not be created"}
+            return {"ERROR": "Seller could not be created"}, 500
 
         return {"id": seller.id, "fantasy_name": seller.fantasy_name}
 
     def put(self, seller_id):
         seller = Seller.query.get(seller_id)
         if seller is None:
-            return {"ERROR": "Seller does not exists"}
+            return {"ERROR": "Seller does not exists"}, 400
 
         body = request.get_json()
 
@@ -93,7 +93,7 @@ class SellerAPI(MethodView):
             seller.address = body.get("address", seller.address)
             db.session.commit()
         except Exception:
-            return {"ERROR": "Seller could not be updated"}
+            return {"ERROR": "Seller could not be updated"}, 500
 
         return jsonify(
             {
@@ -110,7 +110,7 @@ class SellerAPI(MethodView):
     def delete(self, seller_id):
         seller = Seller.query.get(seller_id)
         if seller is None:
-            return {"ERROR": "Seller does not exists"}
+            return {"ERROR": "Seller does not exists"}, 400
 
         seller_info = {
             "id": seller.id,
@@ -121,7 +121,7 @@ class SellerAPI(MethodView):
             db.session.delete(seller)
             db.session.commit()
         except Exception:
-            return {"ERROR": "Seller could not be deleted"}
+            return {"ERROR": "Seller could not be deleted"}, 500
 
         return jsonify({"deleted_seller": seller_info})
 
