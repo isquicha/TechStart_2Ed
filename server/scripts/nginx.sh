@@ -1,0 +1,1 @@
+sudo cp ../nginx/techstart_2ed /etc/nginx/sites-enabled/
