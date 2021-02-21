@@ -157,7 +157,13 @@ class ProductAPI(MethodView):
                 "name": product.name,
                 "price": product.price,
                 "description": product.description,
-                "categories": product.categories,
+                "categories": [
+                    {
+                        "id": category.id,
+                        "name": category.name,
+                    }
+                    for category in product.categories
+                ],
             }
         )
 
