@@ -1,0 +1,14 @@
+server {
+    listen  80;
+    server_name olisttechstart.andrevicente.dev.br;
+
+    localtion /static {
+        alias /home/isquicha/projetos/techstart_2ed/src/static;
+    }
+
+    location / {
+        proxy_pass http://localhost:8000;
+        include /etc/nginx/proxy_params;
+        proxy_redirect off;
+    }
+}
