@@ -354,6 +354,9 @@ class CategoryAPI(MethodView):
     def post(self):
         body = request.get_json()
 
+        if body is None:
+            return {"ERROR": "A body must be provided"}
+
         name = body.get("name", None)
         description = body.get("description", None)
         products = body.get("products", None)
@@ -404,10 +407,96 @@ class CategoryAPI(MethodView):
         }
 
     def put(self, category_id):
-        return {"ERROR": "Not implemented"}, 501
+        category = Product.query.get(category_id)
+        if category is None:
+            return {"ERROR": "Category does not exists"}, 400
+
+        body = request.get_json()
+
+        if body is None:
+            return {"ERROR": "A body must be provided"}
+
+        errors = []
+        products_to_add = body.get("products_to_add", None)
+        products_to_remove = body.get("products_to_remove", None)
+
+        products_list = []
+        if products_to_add is not None:
+            for product in products_to_add:
+                product_to_add = Product.query.get(product)
+                if product_to_add is not None:
+                    products_list.append(product_to_add)
+                else:
+                    errors.append(
+                        f"Product '{product}' not found. "
+                        "Not adding it to category"
+                    )
+            for product in products_list:
+                category.categories.append(product)
+
+        products_list = []
+        if products_to_remove is not None:
+            for product in products_to_remove:
+                product_to_remove = Product.query.get(product)
+                if product_to_remove is not None:
+                    products_list.append(product_to_remove)
+                else:
+                    errors.append(
+                        f"Product '{product}' not found. "
+                        "Not removing it to category"
+                    )
+            for product in products_list:
+                category.categories.remove(product)
+
+        try:
+            category.name = body.get("name", category.name)
+            category.description = body.get(
+                "description", category.description
+            )
+            db.session.commit()
+        except Exception:
+            return {"ERROR": "Category could not be updated"}, 500
+
+        if len(errors) > 0:
+            return {
+                "id": category.id,
+                "name": category.name,
+                "description": category.description,
+                "errors": errors,
+            }
+        return {
+            "id": category.id,
+            "name": category.name,
+            "description": category.description,
+        }
 
     def delete(self, category_id):
-        return {"ERROR": "Not implemented"}, 501
+        category = Category.query.get(category_id)
+        if category is None:
+            return {"ERROR": "Category does not exists"}, 400
+
+        category_info = {
+            {
+                "id": category.id,
+                "name": category.name,
+                "description": category.description,
+                "products": [
+                    {
+                        "id": product.id,
+                        "name": product.name,
+                    }
+                    for product in category.products
+                ],
+            }
+        }
+
+        try:
+            db.session.delete(category)
+            db.session.commit()
+        except Exception:
+            return {"ERROR": "Category could not be deleted"}, 500
+
+        return {"deleted_category": category_info}
 
 
 class MarketplaceAPI(MethodView):
