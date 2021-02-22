@@ -225,11 +225,13 @@ class ProductAPI(MethodView):
         return {"id": product.id, "name": product.name, "price": product.price}
 
     def put(self, product_id):
-        product = Seller.query.get(product_id)
+        product = Product.query.get(product_id)
         if product is None:
             return {"ERROR": "Product does not exists"}, 400
 
         body = request.get_json()
+        if body is None:
+            return {"ERROR": "A request body must be provided"}, 400
 
         price = body.get("price", None)
         try:
@@ -287,7 +289,7 @@ class ProductAPI(MethodView):
         return {"id": product.id, "name": product.name, "price": product.price}
 
     def delete(self, product_id):
-        product = Seller.query.get(product_id)
+        product = Product.query.get(product_id)
         if product is None:
             return {"ERROR": "Product does not exists"}, 400
 
