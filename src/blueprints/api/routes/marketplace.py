@@ -27,7 +27,7 @@ def init_app(bp):
     bp.add_url_rule(
         "/sellers/<int:seller_id>",
         view_func=seller_view,
-        methods=["GET", "PUT", "DELETE"],
+        methods=["GET", "PATCH", "DELETE"],
     )
 
     # * Products
@@ -45,7 +45,7 @@ def init_app(bp):
     bp.add_url_rule(
         "/products/<int:product_id>",
         view_func=product_view,
-        methods=["GET", "PUT", "DELETE"],
+        methods=["GET", "PATCH", "DELETE"],
     )
 
     # * Categories
@@ -63,7 +63,7 @@ def init_app(bp):
     bp.add_url_rule(
         "/categories/<int:category_id>",
         view_func=category_view,
-        methods=["GET", "PUT", "DELETE"],
+        methods=["GET", "PATCH", "DELETE"],
     )
 
     # * Marketplaces
@@ -81,5 +81,5 @@ def init_app(bp):
     bp.add_url_rule(
         "/marketplaces/<int:marketplace_id>",
         view_func=marketplace_view,
-        methods=["GET", "PUT", "DELETE"],
+        methods=["GET", "PATCH", "DELETE"],
     )

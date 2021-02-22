@@ -82,7 +82,7 @@ class SellerAPI(MethodView):
 
         return {"id": seller.id, "fantasy_name": seller.fantasy_name}
 
-    def put(self, seller_id):
+    def patch(self, seller_id):
         seller = Seller.query.get(seller_id)
         if seller is None:
             return {"ERROR": "Seller does not exists"}, 400
@@ -224,7 +224,7 @@ class ProductAPI(MethodView):
             }
         return {"id": product.id, "name": product.name, "price": product.price}
 
-    def put(self, product_id):
+    def patch(self, product_id):
         product = Product.query.get(product_id)
         if product is None:
             return {"ERROR": "Product does not exists"}, 400
@@ -406,7 +406,7 @@ class CategoryAPI(MethodView):
             "description": category.description,
         }
 
-    def put(self, category_id):
+    def patch(self, category_id):
         category = Product.query.get(category_id)
         if category is None:
             return {"ERROR": "Category does not exists"}, 400
@@ -574,7 +574,7 @@ class MarketplaceAPI(MethodView):
 
         return {"id": marketplace.id, "name": marketplace.name}
 
-    def put(self, marketplace_id):
+    def patch(self, marketplace_id):
         marketplace = Seller.query.get(marketplace_id)
         if marketplace is None:
             return {"ERROR": "Marketplace does not exists"}, 400
