@@ -225,10 +225,93 @@ class ProductAPI(MethodView):
         return {"id": product.id, "name": product.name, "price": product.price}
 
     def put(self, product_id):
-        return {"ERROR": "Not implemented"}, 501
+        product = Seller.query.get(product_id)
+        if product is None:
+            return {"ERROR": "Product does not exists"}, 400
+
+        body = request.get_json()
+
+        price = body.get("price", None)
+        try:
+            if price is not None:
+                product.price = float(price)
+        except ValueError:
+            return {"ERROR": "Field 'price' must be a float"}, 400
+
+        errors = []
+        categories_to_add = body.get("categories_to_add", None)
+        categories_to_remove = body.get("categories_to_remove", None)
+
+        categories_list = []
+        if categories_to_add is not None:
+            for category in categories_to_add:
+                category_to_add = Category.query.get(category)
+                if category_to_add is not None:
+                    categories_list.append(category_to_add)
+                else:
+                    errors.append(
+                        f"Category '{category}' not found. "
+                        "Not adding it to product"
+                    )
+            for category in categories_list:
+                product.categories.append(category)
+
+        categories_list = []
+        if categories_to_remove is not None:
+            for category in categories_to_remove:
+                category_to_remove = Category.query.get(category)
+                if category_to_remove is not None:
+                    categories_list.append(category_to_remove)
+                else:
+                    errors.append(
+                        f"Category '{category}' not found. "
+                        "Not removing it to product"
+                    )
+            for category in categories_list:
+                product.categories.remove(category)
+
+        try:
+            product.name = body.get("name", None)
+            product.description = body.get("description", None)
+            db.session.commit()
+        except Exception:
+            return {"ERROR": "Product could not be updated"}, 500
+
+        if len(errors) > 0:
+            return {
+                "id": product.id,
+                "name": product.name,
+                "price": product.price,
+                "errors": errors,
+            }
+        return {"id": product.id, "name": product.name, "price": product.price}
 
     def delete(self, product_id):
-        return {"ERROR": "Not implemented"}, 501
+        product = Seller.query.get(product_id)
+        if product is None:
+            return {"ERROR": "Product does not exists"}, 400
+
+        product_info = {
+            "id": product.id,
+            "name": product.name,
+            "price": product.price,
+            "description": product.description,
+            "categories": [
+                {
+                    "id": category.id,
+                    "name": category.name,
+                }
+                for category in product.categories
+            ],
+        }
+
+        try:
+            db.session.delete(product)
+            db.session.commit()
+        except Exception:
+            return {"ERROR": "Product could not be deleted"}, 500
+
+        return {"deleted_product": product_info}
 
 
 class CategoryAPI(MethodView):
