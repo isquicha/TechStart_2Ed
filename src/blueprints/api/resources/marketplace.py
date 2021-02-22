@@ -233,7 +233,7 @@ class ProductAPI(MethodView):
         if body is None:
             return {"ERROR": "A request body must be provided"}, 400
 
-        price = body.get("price", None)
+        price = body.get("price", product.price)
         try:
             if price is not None:
                 product.price = float(price)
@@ -273,8 +273,8 @@ class ProductAPI(MethodView):
                 product.categories.remove(category)
 
         try:
-            product.name = body.get("name", None)
-            product.description = body.get("description", None)
+            product.name = body.get("name", product.name)
+            product.description = body.get("description", product.description)
             db.session.commit()
         except Exception:
             return {"ERROR": "Product could not be updated"}, 500
