@@ -339,7 +339,7 @@ class MarketplaceAPI(MethodView):
                     }
                 )
 
-            return marketplaces
+            return jsonify(marketplaces)
 
         marketplace = Marketplace.query.get(marketplace_id)
         if marketplace is None:
