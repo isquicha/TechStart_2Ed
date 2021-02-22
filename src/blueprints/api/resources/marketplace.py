@@ -2,7 +2,7 @@ from flask import jsonify, request
 from flask.views import MethodView
 
 from src.extensions.database import db
-from src.models.marketplace import Seller, Product, Category
+from src.models.marketplace import Seller, Product, Category, Marketplace
 
 
 class SellerAPI(MethodView):
@@ -327,13 +327,129 @@ class CategoryAPI(MethodView):
 
 class MarketplaceAPI(MethodView):
     def get(self, marketplace_id):
-        pass
+        if marketplace_id is None:
+            marketplaces = []
+
+            for marketplace in Marketplace.query.all():
+                marketplaces.append(
+                    {
+                        "id": marketplace.id,
+                        "name": marketplace.name,
+                        "description": marketplace.description,
+                    }
+                )
+
+            return marketplaces
+
+        marketplace = Marketplace.query.get(marketplace_id)
+        if marketplace is None:
+            return {"ERROR": "Marketplace does not exists"}, 400
+
+        return {
+            "id": marketplace.id,
+            "name": marketplace.name,
+            "description": marketplace.description,
+            "email": marketplace.email,
+            "phone": marketplace.phone,
+            "website": marketplace.website,
+            "technical_contact": marketplace.technical_contact,
+        }
 
     def post(self):
-        pass
+        body = request.get_json()
+
+        name = body.get("name", None)
+        description = body.get("description", None)
+        email = body.get("email", None)
+        phone = body.get("phone", None)
+        website = body.get("website", None)
+        technical_contact = body.get("technical_contact", None)
+
+        if name is None:
+            return {"ERROR": "Field 'name' must not be empty"}, 400
+        if description is None:
+            return {"ERROR": "Field 'description' must not be empty"}, 400
+        if email is None:
+            return {"ERROR": "Field 'email' must not be empty"}, 400
+        if phone is None:
+            return {"ERROR": "Field 'phone' must not be empty"}, 400
+        if website is None:
+            return {"ERROR": "Field 'website' must not be empty"}, 400
+        if technical_contact is None:
+            return {
+                "ERROR": "Field 'technical_contact' must not be empty"
+            }, 400
+
+        if Marketplace.query.filter_by(name=name).first():
+            return {"ERROR": "Marketplace name already registered"}, 400
+
+        marketplace = Seller(
+            name=name,
+            description=description,
+            email=email,
+            phone=phone,
+            website=website,
+            technical_contact=technical_contact,
+        )
+
+        try:
+            db.session.add(marketplace)
+            db.session.commit()
+        except Exception:
+            return {"ERROR": "Marketplace could not be created"}, 500
+
+        return {"id": marketplace.id, "name": marketplace.name}
 
     def put(self, marketplace_id):
-        pass
+        marketplace = Seller.query.get(marketplace_id)
+        if marketplace is None:
+            return {"ERROR": "Marketplace does not exists"}, 400
+
+        body = request.get_json()
+
+        try:
+            marketplace.name = body.get("name", marketplace.name)
+            marketplace.description = body.get(
+                "description", marketplace.description
+            )
+            marketplace.email = body.get("email", marketplace.email)
+            marketplace.phone = body.get("phone", marketplace.phone)
+            marketplace.website = body.get("website", marketplace.website)
+            marketplace.technical_contact = body.get(
+                "technical_contact", marketplace.technical_contact
+            )
+            db.session.commit()
+        except Exception:
+            return {"ERROR": "Marketplace could not be updated"}, 500
+
+        return {
+            "id": marketplace.id,
+            "name": marketplace.name,
+            "description": marketplace.description,
+            "email": marketplace.email,
+            "phone": marketplace.phone,
+            "website": marketplace.website,
+            "technical_contact": marketplace.technical_contact,
+        }
 
     def delete(self, marketplace_id):
-        pass
+        marketplace = Seller.query.get(marketplace_id)
+        if marketplace is None:
+            return {"ERROR": "Marketplace does not exists"}, 400
+
+        marketplace_info = {
+            "id": marketplace.id,
+            "name": marketplace.name,
+            "description": marketplace.description,
+            "email": marketplace.email,
+            "phone": marketplace.phone,
+            "website": marketplace.website,
+            "technical_contact": marketplace.technical_contact,
+        }
+        try:
+            db.session.delete(marketplace)
+            db.session.commit()
+        except Exception:
+            return {"ERROR": "Marketplace could not be deleted"}, 500
+
+        return {"deleted_marketplace": marketplace_info}
