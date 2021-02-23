@@ -34,8 +34,20 @@
                         <div class="mb-2">
                             <label class="form-label">Categories</label>
                             <ul id="modal_categories">
-
                             </ul>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Categories to add</label>
+                            <input type="text" class="form-control"
+                                name="categories_to_add"
+                                id="modal_categories_to_add">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Categories to
+                                remove</label>
+                            <input type="text" class="form-control"
+                                name="categories_to_remove"
+                                id="modal_categories_to_remove">
                         </div>
                     </div>
 
@@ -93,19 +105,24 @@
 <div class="collapse my-3" id="collapse-form2">
     <form>
         <div class="row">
-            <div class="mb-2 col-md-4">
+            <div class="mb-2 col-md-3">
                 <label class="form-label">Name</label>
                 <input type="text" class="form-control" id="search_name"
                     onkeyup="create_cards()">
             </div>
-            <div class="mb-2 col-md-4">
+            <div class="mb-2 col-md-3">
                 <label class="form-label">Description</label>
                 <input type="text" class="form-control" id="search_description"
                     onkeyup="create_cards()">
             </div>
-            <div class="mb-2 col-md-4">
+            <div class="mb-2 col-md-3">
                 <label class="form-label">Price (must be exact)</label>
                 <input type="text" class="form-control" id="search_price"
+                    onkeyup="create_cards()">
+            </div>
+            <div class="mb-2 col-md-3">
+                <label class="form-label">Categories</label>
+                <input type="text" class="form-control" id="search_categories"
                     onkeyup="create_cards()">
             </div>
         </div>
@@ -136,6 +153,8 @@
     const description_modal_field = document.querySelector("#modal_description");
     const price_modal_field = document.querySelector("#modal_price");
     const categories_modal_field = document.querySelector("#modal_categories");
+    const categories_to_add_modal_field = document.querySelector("#modal_categories_to_add");
+    const categories_to_remove_modal_field = document.querySelector("#modal_categories_to_remove");
 
     const name_search_field = document.querySelector("#search_name");
     const description_search_field = document.querySelector("#search_description");
@@ -146,10 +165,12 @@
         let name = name_search_field.value;
         let description = description_search_field.value;
         let price = price_search_field.value;
+        let categories = categories_search_field.value;
         let custom_url = url + "?"
         if (name != "") custom_url += `name=${name}&`;
         if (description != "") custom_url += `description=${description}&`;
         if (price != "") custom_url += `price=${price}&`;
+        if (categories != "") custom_url += `categories=${categories}&`;
         fetch(custom_url)
             .then((response) => response.json())
             .then((products) => {
@@ -238,6 +259,8 @@
         const name = name_modal_field.value;
         const description = description_modal_field.value;
         const price = price_modal_field.value;
+        const categories_to_add = categories_to_add_modal_field.value;
+        const categories_to_remove = categories_to_remove_modal_field.value;
 
         fetch(`${url}${product_id}`, {
             method: 'PATCH',
@@ -253,10 +276,14 @@
                 'name': name,
                 'description': description,
                 'price': price,
+                'categories_to_add': categories_to_add,
+                'categories_to_remove': categories_to_remove,
             }),
         })
             .then((response) => response.json())
             .then((product) => {
+                categories_to_add_modal_field.value = "";
+                categories_to_remove_modal_field.value = "";
                 create_cards();
             });
 
