@@ -476,18 +476,16 @@ class CategoryAPI(MethodView):
             return {"ERROR": "Category does not exists"}, 400
 
         category_info = {
-            {
-                "id": category.id,
-                "name": category.name,
-                "description": category.description,
-                "products": [
-                    {
-                        "id": product.id,
-                        "name": product.name,
-                    }
-                    for product in category.products
-                ],
-            }
+            "id": category.id,
+            "name": category.name,
+            "description": category.description,
+            "products": [
+                {
+                    "id": product.id,
+                    "name": product.name,
+                }
+                for product in category.products
+            ],
         }
 
         try:
