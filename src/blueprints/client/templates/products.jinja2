@@ -31,6 +31,12 @@
                             <input type="text" class="form-control"
                                 name="price" required id="modal_price">
                         </div>
+                        <div class="mb-2">
+                            <label class="form-label">Categories</label>
+                            <ul id="modal_categories">
+
+                            </ul>
+                        </div>
                     </div>
 
                 </form>
@@ -124,14 +130,17 @@
     const name_field = document.querySelector("#name");
     const description_field = document.querySelector("#description");
     const price_field = document.querySelector("#price");
+    const categories_field = document.querySelector("#categories");
 
     const name_modal_field = document.querySelector("#modal_name");
     const description_modal_field = document.querySelector("#modal_description");
     const price_modal_field = document.querySelector("#modal_price");
+    const categories_modal_field = document.querySelector("#modal_categories");
 
     const name_search_field = document.querySelector("#search_name");
     const description_search_field = document.querySelector("#search_description");
     const price_search_field = document.querySelector("#search_price");
+    const categories_search_field = document.querySelector("#search_categories");
 
     const create_cards = () => {
         let name = name_search_field.value;
@@ -175,6 +184,12 @@
                 name_modal_field.value = product.name;
                 description_modal_field.value = product.description;
                 price_modal_field.value = product.price;
+                categories_modal_field.innerHTML = "";
+                for (category of product.categories) {
+                    categories_modal_field.innerHTML += `
+                        <li>${category.id}: ${category.name}</li>
+                    `;
+                }
             });
     }
 
