@@ -28,8 +28,9 @@
                         </div>
                         <div class="mb-2">
                             <label class="form-label">Website</label>
-                            <input type="text" class="form-control"
-                                name="website" required id="modal_website">
+                            <input type="url" class="form-control"
+                                name="website" required id="modal_website"
+                                value="https://">
                         </div>
                         <div class="mb-2">
                             <label class="form-label">Email</label>
@@ -38,8 +39,8 @@
                         </div>
                         <div class="mb-2">
                             <label class="form-label">Phone</label>
-                            <input type="text" class="form-control"
-                                name="phone" id="modal_phone" required>
+                            <input type="tel" class="form-control" name="phone"
+                                id="modal_phone" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Technical Contact</label>
@@ -86,8 +87,8 @@
             </div>
             <div class="mb-2 col-md-4">
                 <label class="form-label">Website</label>
-                <input type="text" class="form-control" name="website" required
-                    id="website">
+                <input type="url" class="form-control" name="website" required
+                    id="website" value="https://">
             </div>
             <div class="mb-3 col-md-4">
                 <label class="form-label">Technical Contact</label>
@@ -101,7 +102,7 @@
             </div>
             <div class="mb-2 col-md-4">
                 <label class="form-label">Phone</label>
-                <input type="text" class="form-control" name="phone" id="phone"
+                <input type="tel" class="form-control" name="phone" id="phone"
                     required>
             </div>
         </div>
@@ -218,7 +219,7 @@
 
         name_field.value = "";
         description_field.value = "";
-        website_field.value = "";
+        website_field.value = "https://";
         email_field.value = "";
         phone_field.value = "";
         technical_contact_field.value = "";
