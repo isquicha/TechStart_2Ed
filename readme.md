@@ -5,6 +5,12 @@ This project is a programming challenge for an interview at [Olist](https://gith
 
 It's basically a CRUD with 4 tables (Products, Categories, Sellers, Marketplaces). To do so, I made an API with Python's web framework Flask.
 
+Project running at [THIS LINK](http://olisttechstart.andrevicente.dev.br/).
+
+### Screenshots
+![screenshots/1.jpg](screenshots/1.jpg)
+![screenshots/2.jpg](screenshots/2.jpg)
+![screenshots/3.jpg](screenshots/3.jpg)
 ### Files and folder structure
 - [settings.py](settings.py) is responsible for the project's settings, with includes configuration variables, extensions and blueprints.
 - `migrations` folder is a database migrations folder created and managed by flask-migrate extension
