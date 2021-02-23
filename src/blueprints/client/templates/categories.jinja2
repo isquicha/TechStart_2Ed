@@ -1,0 +1,210 @@
+{% extends 'base.jinja2' %}
+
+{% block body %}
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modal"
+    aria-hidden="true">
+    <div id="modal_category_id" style="display: none;"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="was-validated" id="modal_form">
+                    <div class="row">
+                        <div class="mb-2">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name"
+                                required id="modal_name">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-control"
+                                name="description" required
+                                id="modal_description">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger"
+                    onclick="delete_category()" data-bs-toggle="modal"
+                    data-bs-target="#modal">Delete</button>
+                <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success"
+                    onclick="edit_category()" data-bs-dismiss="modal">Save
+                    changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New category Form -->
+<button class="btn btn-success mb-3" type="button" data-bs-toggle="collapse"
+    data-bs-target="#collapse-form" aria-expanded="false"
+    aria-controls="collapse-form" id="new_category_button">
+    Create new category
+</button>
+<div class="collapse my-3" id="collapse-form">
+    <form class="was-validated" id="new_form">
+        <div class="row">
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" name="name" required
+                    id="name">
+            </div>
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-control" name="description"
+                    required id="description">
+            </div>
+        </div>
+    </form>
+    <button class="btn btn-primary"
+        onclick="create_category()">Create!</button>
+</div>
+
+<!-- Categories Cards -->
+<div class="row" id="categories-cards">
+</div>
+{% endblock body %}
+<!---->
+{% block invisible %}
+<span id="b-api-url">{{ url_for('api.category_api') }}</span>
+{% endblock invisible %}
+<!---->
+{% block scripts %}
+<script>
+    const url = document.querySelector("#b-api-url").innerHTML;
+    const categories_cards = document.querySelector("#categories-cards");
+    const modal_title = document.querySelector("#modal-title");
+
+    const name_field = document.querySelector("#name");
+    const description_field = document.querySelector("#description");
+
+    const name_modal_field = document.querySelector("#modal_name");
+    const description_modal_field = document.querySelector("#modal_description");
+
+    const create_cards = () => {
+        fetch(url)
+            .then((response) => response.json())
+            .then((categories) => {
+                categories_cards.innerHTML = "";
+                for (category of categories) {
+                    const category_card = document.createElement("div");
+                    category_card.setAttribute("class", "col-sm-6 col-lg-3 mb-3");
+                    category_card.innerHTML = `
+                <div class="card" id="category${category.id}card">
+                    <div class="card-body">
+                        <h5 class="card-title">${category.name}</h5>
+                        <p class="card-text">
+                            Description: ${category.description}
+                        </p>
+                        <button onclick="edit_modal(${category.id})" 
+                        class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#modal">View more</button>
+                    </div>
+                </div>`;
+                    categories_cards.insertBefore(category_card, categories_cards.firstChild);
+                }
+            });
+    }
+
+    const edit_modal = (category_id) => {
+        document.querySelector("#modal_category_id").innerHTML = category_id;
+
+        fetch(`${url}${category_id}`)
+            .then((response) => response.json())
+            .then((category) => {
+                modal_title.innerHTML = category.name;
+                name_modal_field.value = category.name;
+                description_modal_field.value = category.description;
+            });
+    }
+
+    const create_category = (category_id) => {
+        const form = document.querySelector("#new_form");
+        if (!form.checkValidity()) {
+            return;
+        }
+        const name = name_field.value;
+        const description = description_field.value;
+        fetch(`${url}`, {
+            method: 'POST',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify({
+                'name': name,
+                'description': description,
+            }),
+        })
+            .then((response) => response.json())
+            .then((category) => {
+                create_cards();
+            });
+
+        name_field.value = "";
+        description_field.value = "";
+        const new_category_button = document.querySelector("#new_category_button");
+        new_category_button.click();
+    }
+
+    const edit_category = () => {
+        const category_id = document.querySelector("#modal_category_id").innerHTML;
+        const form = document.querySelector("#modal_form");
+        if (!form.checkValidity()) {
+            return;
+        }
+        const name = name_modal_field.value;
+        const description = description_modal_field.value;
+
+        fetch(`${url}${category_id}`, {
+            method: 'PATCH',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify({
+                'name': name,
+                'description': description,
+            }),
+        })
+            .then((response) => response.json())
+            .then((category) => {
+                create_cards();
+            });
+
+    }
+
+    const delete_category = () => {
+        const category_id = document.querySelector("#modal_category_id").innerHTML;
+        const card = document.querySelector(`#category${category_id}card`);
+        fetch(`${url}${category_id}`, {
+            method: 'DELETE',
+        })
+            .then((response) => response.json())
+            .then((category) => {
+                modal_title.innerHTML = category.name;
+                create_cards();
+            });
+    }
+
+    create_cards();
+
+</script>
+{% endblock scripts %}

@@ -14,7 +14,7 @@ def products():
 
 
 def categories():
-    return "categories"
+    return render_template("categories.jinja2")
 
 
 def marketplaces():
