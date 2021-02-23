@@ -139,7 +139,6 @@ class ProductAPI(MethodView):
             body = request.args
             if len(body) > 0:
                 name = body.get("name", "")
-                print(f"x{name}x")
                 description = body.get("description", "")
 
                 categories_list = body.get("categories", [])
@@ -170,7 +169,6 @@ class ProductAPI(MethodView):
                     pass
 
                 filtered_products = filtered_products.all()
-                print(f"z{filtered_products}x")
             else:
                 filtered_products = Product.query.all()
 
