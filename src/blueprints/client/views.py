@@ -18,4 +18,4 @@ def categories():
 
 
 def marketplaces():
-    return "marketplaces"
+    return render_template("marketplaces.jinja2")
