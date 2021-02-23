@@ -1,0 +1,283 @@
+{% extends 'base.jinja2' %}
+
+{% block body %}
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modal"
+    aria-hidden="true">
+    <div id="modal_seller_id" style="display: none;"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="was-validated" id="modal_form">
+                    <div class="row">
+                        <div class="mb-2">
+                            <label class="form-label">Fantasy Name</label>
+                            <input type="text" class="form-control"
+                                name="fantasy_name" required
+                                id="modal_fantasy_name">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-control"
+                                name="company_name" required
+                                id="modal_company_name">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Tax Code</label>
+                            <input type="text" class="form-control"
+                                name="tax_code" required id="modal_tax_code">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control"
+                                name="email" id="modal_email" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Phone</label>
+                            <input type="text" class="form-control"
+                                name="phone" id="modal_phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <input type="text" class="form-control"
+                                name="address" required id="modal_address">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger"
+                    onclick="delete_seller()" data-bs-toggle="modal"
+                    data-bs-target="#modal">Delete</button>
+                <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success"
+                    onclick="edit_seller()" data-bs-dismiss="modal">Save
+                    changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Seller Form -->
+<button class="btn btn-success mb-3" type="button" data-bs-toggle="collapse"
+    data-bs-target="#collapse-form" aria-expanded="false"
+    aria-controls="collapse-form" id="new_seller_button">
+    Create new seller
+</button>
+<div class="collapse my-3" id="collapse-form">
+    <form class="was-validated" id="new_form">
+        <div class="row">
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Fantasy Name</label>
+                <input type="text" class="form-control" name="fantasy_name"
+                    required id="fantasy_name">
+            </div>
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Company Name</label>
+                <input type="text" class="form-control" name="company_name"
+                    required id="company_name">
+            </div>
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Tax Code</label>
+                <input type="text" class="form-control" name="tax_code"
+                    required id="tax_code">
+            </div>
+            <div class="mb-3 col-md-6">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" name="address" required
+                    id="address">
+            </div>
+            <div class="mb-2 col-md-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email"
+                    id="email" required>
+            </div>
+            <div class="mb-2 col-md-3">
+                <label class="form-label">Phone</label>
+                <input type="text" class="form-control" name="phone" id="phone"
+                    required>
+            </div>
+        </div>
+
+    </form>
+    <button class="btn btn-primary" onclick="create_seller()">Create!</button>
+</div>
+
+<!-- Sellers Cards -->
+<div class="row" id="sellers-cards">
+</div>
+{% endblock body %}
+<!---->
+{% block invisible %}
+<span id="b-api-url">{{ url_for('api.seller_api') }}</span>
+{% endblock invisible %}
+<!---->
+{% block scripts %}
+<script>
+    const url = document.querySelector("#b-api-url").innerHTML;
+    const sellers_cards = document.querySelector("#sellers-cards");
+    const modal_title = document.querySelector("#modal-title");
+
+    const fantasy_name_field = document.querySelector("#fantasy_name");
+    const company_name_field = document.querySelector("#company_name");
+    const tax_code_field = document.querySelector("#tax_code");
+    const email_field = document.querySelector("#email");
+    const phone_field = document.querySelector("#phone");
+    const address_field = document.querySelector("#address");
+
+    const fantasy_name_modal_field = document.querySelector("#modal_fantasy_name");
+    const company_name_modal_field = document.querySelector("#modal_company_name");
+    const tax_code_modal_field = document.querySelector("#modal_tax_code");
+    const email_modal_field = document.querySelector("#modal_email");
+    const phone_modal_field = document.querySelector("#modal_phone");
+    const address_modal_field = document.querySelector("#modal_address");
+
+    const create_cards = () => {
+        fetch(url)
+            .then((response) => response.json())
+            .then((sellers) => {
+                sellers_cards.innerHTML = "";
+                for (seller of sellers) {
+                    const seller_card = document.createElement("div");
+                    seller_card.setAttribute("class", "col-sm-6 col-lg-3 mb-3");
+                    seller_card.innerHTML = `
+                <div class="card" id="seller${seller.id}card">
+                    <div class="card-body">
+                        <h5 class="card-title">${seller.fantasy_name}</h5>
+                        <p class="card-text">
+                            Company name: ${seller.company_name}
+                        </p>
+                        <button onclick="edit_modal(${seller.id})" 
+                        class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#modal">View more</button>
+                    </div>
+                </div>`;
+                    sellers_cards.insertBefore(seller_card, sellers_cards.firstChild);
+                }
+            });
+    }
+
+    const edit_modal = (seller_id) => {
+        document.querySelector("#modal_seller_id").innerHTML = seller_id;
+
+        fetch(`${url}${seller_id}`)
+            .then((response) => response.json())
+            .then((seller) => {
+                modal_title.innerHTML = seller.fantasy_name;
+                fantasy_name_modal_field.value = seller.fantasy_name;
+                company_name_modal_field.value = seller.company_name;
+                tax_code_modal_field.value = seller.tax_code;
+                email_modal_field.value = seller.email;
+                phone_modal_field.value = seller.phone;
+                address_modal_field.value = seller.address;
+            });
+    }
+
+    const create_seller = (seller_id) => {
+        const form = document.querySelector("#new_form");
+        if (!form.checkValidity()) {
+            return;
+        }
+        const fantasy_name = fantasy_name_field.value;
+        const company_name = company_name_field.value;
+        const tax_code = tax_code_field.value;
+        const email = email_field.value;
+        const phone = phone_field.value;
+        const address = address_field.value;
+        fetch(`${url}`, {
+            method: 'POST',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify({
+                'fantasy_name': fantasy_name,
+                'company_name': company_name,
+                'tax_code': tax_code,
+                'email': email,
+                'phone': phone,
+                'address': address,
+            }),
+        })
+            .then((response) => response.json())
+            .then((seller) => {
+                create_cards();
+            });
+
+        fantasy_name_field.value = "";
+        company_name_field.value = "";
+        tax_code_field.value = "";
+        email_field.value = "";
+        phone_field.value = "";
+        address_field.value = "";
+        const new_seller_button = document.querySelector("#new_seller_button");
+        new_seller_button.click();
+    }
+
+    const edit_seller = () => {
+        const seller_id = document.querySelector("#modal_seller_id").innerHTML;
+        const form = document.querySelector("#modal_form");
+        if (!form.checkValidity()) {
+            return;
+        }
+        const fantasy_name = fantasy_name_modal_field.value;
+        const company_name = company_name_modal_field.value;
+        const tax_code = tax_code_modal_field.value;
+        const email = email_modal_field.value;
+        const phone = phone_modal_field.value;
+        const address = address_modal_field.value;
+
+        fetch(`${url}${seller_id}`, {
+            method: 'PATCH',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify({
+                'fantasy_name': fantasy_name,
+                'company_name': company_name,
+                'tax_code': tax_code,
+                'email': email,
+                'phone': phone,
+                'address': address,
+            }),
+        })
+            .then((response) => response.json())
+            .then((seller) => {
+                create_cards();
+            });
+
+    }
+
+    const delete_seller = () => {
+        const seller_id = document.querySelector("#modal_seller_id").innerHTML;
+        const card = document.querySelector(`#seller${seller_id}card`);
+        fetch(`${url}${seller_id}`, {
+            method: 'DELETE',
+        })
+            .then((response) => response.json())
+            .then((seller) => {
+                modal_title.innerHTML = seller.fantasy_name;
+                create_cards();
+            });
+    }
+
+    create_cards();
+
+</script>
+{% endblock scripts %}
