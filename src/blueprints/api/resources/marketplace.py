@@ -407,7 +407,7 @@ class CategoryAPI(MethodView):
         }
 
     def patch(self, category_id):
-        category = Product.query.get(category_id)
+        category = Category.query.get(category_id)
         if category is None:
             return {"ERROR": "Category does not exists"}, 400
 
