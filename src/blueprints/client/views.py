@@ -10,7 +10,7 @@ def sellers():
 
 
 def products():
-    return "products"
+    return render_template("products.jinja2")
 
 
 def categories():
