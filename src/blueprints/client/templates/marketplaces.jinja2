@@ -1,0 +1,284 @@
+{% extends 'base.jinja2' %}
+
+{% block body %}
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modal"
+    aria-hidden="true">
+    <div id="modal_marketplace_id" style="display: none;"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="was-validated" id="modal_form">
+                    <div class="row">
+                        <div class="mb-2">
+                            <label class="form-label">Fantasy Name</label>
+                            <input type="text" class="form-control" name="name"
+                                required id="modal_name">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-control"
+                                name="description" required
+                                id="modal_description">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Tax Code</label>
+                            <input type="text" class="form-control"
+                                name="website" required id="modal_website">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control"
+                                name="email" id="modal_email" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Phone</label>
+                            <input type="text" class="form-control"
+                                name="phone" id="modal_phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">technical_contact</label>
+                            <input type="text" class="form-control"
+                                name="technical_contact" required
+                                id="modal_technical_contact">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger"
+                    onclick="delete_marketplace()" data-bs-toggle="modal"
+                    data-bs-target="#modal">Delete</button>
+                <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success"
+                    onclick="edit_marketplace()" data-bs-dismiss="modal">Save
+                    changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Marketplace Form -->
+<button class="btn btn-success mb-3" type="button" data-bs-toggle="collapse"
+    data-bs-target="#collapse-form" aria-expanded="false"
+    aria-controls="collapse-form" id="new_marketplace_button">
+    Create new marketplace
+</button>
+<div class="collapse my-3" id="collapse-form">
+    <form class="was-validated" id="new_form">
+        <div class="row">
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" name="name" required
+                    id="name">
+            </div>
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-control" name="description"
+                    required id="description">
+            </div>
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Website</label>
+                <input type="text" class="form-control" name="website" required
+                    id="website">
+            </div>
+            <div class="mb-3 col-md-4">
+                <label class="form-label">Technical Contact</label>
+                <input type="text" class="form-control"
+                    name="technical_contact" required id="technical_contact">
+            </div>
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email"
+                    id="email" required>
+            </div>
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Phone</label>
+                <input type="text" class="form-control" name="phone" id="phone"
+                    required>
+            </div>
+        </div>
+
+    </form>
+    <button class="btn btn-primary"
+        onclick="create_marketplace()">Create!</button>
+</div>
+
+<!-- Marketplaces Cards -->
+<div class="row" id="marketplaces-cards">
+</div>
+{% endblock body %}
+<!---->
+{% block invisible %}
+<span id="b-api-url">{{ url_for('api.marketplace_api') }}</span>
+{% endblock invisible %}
+<!---->
+{% block scripts %}
+<script>
+    const url = document.querySelector("#b-api-url").innerHTML;
+    const marketplaces_cards = document.querySelector("#marketplaces-cards");
+    const modal_title = document.querySelector("#modal-title");
+
+    const name_field = document.querySelector("#name");
+    const description_field = document.querySelector("#description");
+    const website_field = document.querySelector("#website");
+    const email_field = document.querySelector("#email");
+    const phone_field = document.querySelector("#phone");
+    const technical_contact_field = document.querySelector("#technical_contact");
+
+    const name_modal_field = document.querySelector("#modal_name");
+    const description_modal_field = document.querySelector("#modal_description");
+    const website_modal_field = document.querySelector("#modal_website");
+    const email_modal_field = document.querySelector("#modal_email");
+    const phone_modal_field = document.querySelector("#modal_phone");
+    const technical_contact_modal_field = document.querySelector("#modal_technical_contact");
+
+    const create_cards = () => {
+        fetch(url)
+            .then((response) => response.json())
+            .then((marketplaces) => {
+                marketplaces_cards.innerHTML = "";
+                for (marketplace of marketplaces) {
+                    const marketplace_card = document.createElement("div");
+                    marketplace_card.setAttribute("class", "col-sm-6 col-lg-3 mb-3");
+                    marketplace_card.innerHTML = `
+                <div class="card" id="marketplace${marketplace.id}card">
+                    <div class="card-body">
+                        <h5 class="card-title">${marketplace.name}</h5>
+                        <p class="card-text">
+                            Company name: ${marketplace.description}
+                        </p>
+                        <button onclick="edit_modal(${marketplace.id})" 
+                        class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#modal">View more</button>
+                    </div>
+                </div>`;
+                    marketplaces_cards.insertBefore(marketplace_card, marketplaces_cards.firstChild);
+                }
+            });
+    }
+
+    const edit_modal = (marketplace_id) => {
+        document.querySelector("#modal_marketplace_id").innerHTML = marketplace_id;
+
+        fetch(`${url}${marketplace_id}`)
+            .then((response) => response.json())
+            .then((marketplace) => {
+                modal_title.innerHTML = marketplace.name;
+                name_modal_field.value = marketplace.name;
+                description_modal_field.value = marketplace.description;
+                website_modal_field.value = marketplace.website;
+                email_modal_field.value = marketplace.email;
+                phone_modal_field.value = marketplace.phone;
+                technical_contact_modal_field.value = marketplace.technical_contact;
+            });
+    }
+
+    const create_marketplace = (marketplace_id) => {
+        const form = document.querySelector("#new_form");
+        if (!form.checkValidity()) {
+            return;
+        }
+        const name = name_field.value;
+        const description = description_field.value;
+        const website = website_field.value;
+        const email = email_field.value;
+        const phone = phone_field.value;
+        const technical_contact = technical_contact_field.value;
+        fetch(`${url}`, {
+            method: 'POST',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify({
+                'name': name,
+                'description': description,
+                'website': website,
+                'email': email,
+                'phone': phone,
+                'technical_contact': technical_contact,
+            }),
+        })
+            .then((response) => response.json())
+            .then((marketplace) => {
+                create_cards();
+            });
+
+        name_field.value = "";
+        description_field.value = "";
+        website_field.value = "";
+        email_field.value = "";
+        phone_field.value = "";
+        technical_contact_field.value = "";
+        const new_marketplace_button = document.querySelector("#new_marketplace_button");
+        new_marketplace_button.click();
+    }
+
+    const edit_marketplace = () => {
+        const marketplace_id = document.querySelector("#modal_marketplace_id").innerHTML;
+        const form = document.querySelector("#modal_form");
+        if (!form.checkValidity()) {
+            return;
+        }
+        const name = name_modal_field.value;
+        const description = description_modal_field.value;
+        const website = website_modal_field.value;
+        const email = email_modal_field.value;
+        const phone = phone_modal_field.value;
+        const technical_contact = technical_contact_modal_field.value;
+
+        fetch(`${url}${marketplace_id}`, {
+            method: 'PATCH',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify({
+                'name': name,
+                'description': description,
+                'website': website,
+                'email': email,
+                'phone': phone,
+                'technical_contact': technical_contact,
+            }),
+        })
+            .then((response) => response.json())
+            .then((marketplace) => {
+                create_cards();
+            });
+
+    }
+
+    const delete_marketplace = () => {
+        const marketplace_id = document.querySelector("#modal_marketplace_id").innerHTML;
+        const card = document.querySelector(`#marketplace${marketplace_id}card`);
+        fetch(`${url}${marketplace_id}`, {
+            method: 'DELETE',
+        })
+            .then((response) => response.json())
+            .then((marketplace) => {
+                modal_title.innerHTML = marketplace.name;
+                create_cards();
+            });
+    }
+
+    create_cards();
+
+</script>
+{% endblock scripts %}
