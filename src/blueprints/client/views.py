@@ -6,7 +6,7 @@ def index():
 
 
 def sellers():
-    return "sellers"
+    return render_template("sellers.jinja2")
 
 
 def products():
