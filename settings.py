@@ -68,5 +68,7 @@ blueprints = {
         "client",
     ],
     "TESTING": [],
-    "PRODUCTION": [],
+    "PRODUCTION": [
+        "client",
+    ],
 }
