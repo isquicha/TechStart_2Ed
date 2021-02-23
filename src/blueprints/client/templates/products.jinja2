@@ -1,0 +1,265 @@
+{% extends 'base.jinja2' %}
+
+{% block body %}
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modal"
+    aria-hidden="true">
+    <div id="modal_product_id" style="display: none;"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="was-validated" id="modal_form">
+                    <div class="row">
+                        <div class="mb-2">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name"
+                                required id="modal_name">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-control"
+                                name="description" required
+                                id="modal_description">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Price</label>
+                            <input type="text" class="form-control"
+                                name="price" required id="modal_price">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger"
+                    onclick="delete_product()" data-bs-toggle="modal"
+                    data-bs-target="#modal">Delete</button>
+                <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success"
+                    onclick="edit_product()" data-bs-dismiss="modal">Save
+                    changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New product Form -->
+<button class="btn btn-success mb-3" type="button" data-bs-toggle="collapse"
+    data-bs-target="#collapse-form" aria-expanded="false"
+    aria-controls="collapse-form" id="new_product_button">
+    Create new product
+</button>
+<div class="collapse my-3" id="collapse-form">
+    <form class="was-validated" id="new_form">
+        <div class="row">
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" name="name" required
+                    id="name">
+            </div>
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-control" name="description"
+                    required id="description">
+            </div>
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Price</label>
+                <input type="text" class="form-control" name="price" required
+                    id="price">
+            </div>
+        </div>
+    </form>
+    <button class="btn btn-primary" onclick="create_product()">Create!</button>
+</div>
+
+<!-- Search product Form -->
+<button class="btn btn-warning mb-3" type="button" data-bs-toggle="collapse"
+    data-bs-target="#collapse-form2" aria-expanded="false"
+    aria-controls="collapse-form2" id="search_product_button">
+    Search products
+</button>
+<div class="collapse my-3" id="collapse-form2">
+    <form>
+        <div class="row">
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" id="search_name"
+                    onkeyup="create_cards()">
+            </div>
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-control" id="search_description"
+                    onkeyup="create_cards()">
+            </div>
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Price (must be exact)</label>
+                <input type="text" class="form-control" id="search_price"
+                    onkeyup="create_cards()">
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- products Cards -->
+<div class="row" id="products-cards">
+</div>
+{% endblock body %}
+<!---->
+{% block invisible %}
+<span id="b-api-url">{{ url_for('api.product_api') }}</span>
+{% endblock invisible %}
+<!---->
+{% block scripts %}
+<script>
+    const url = document.querySelector("#b-api-url").innerHTML;
+    const products_cards = document.querySelector("#products-cards");
+    const modal_title = document.querySelector("#modal-title");
+
+    const name_field = document.querySelector("#name");
+    const description_field = document.querySelector("#description");
+    const price_field = document.querySelector("#price");
+
+    const name_modal_field = document.querySelector("#modal_name");
+    const description_modal_field = document.querySelector("#modal_description");
+    const price_modal_field = document.querySelector("#modal_price");
+
+    const name_search_field = document.querySelector("#search_name");
+    const description_search_field = document.querySelector("#search_description");
+    const price_search_field = document.querySelector("#search_price");
+
+    const create_cards = () => {
+        let name = name_search_field.value;
+        let description = description_search_field.value;
+        let price = price_search_field.value;
+        let custom_url = url + "?"
+        if (name != "") custom_url += `name=${name}&`;
+        if (description != "") custom_url += `description=${description}&`;
+        if (price != "") custom_url += `price=${price}&`;
+        fetch(custom_url)
+            .then((response) => response.json())
+            .then((products) => {
+                products_cards.innerHTML = "";
+                for (product of products) {
+                    const product_card = document.createElement("div");
+                    product_card.setAttribute("class", "col-sm-6 col-lg-3 mb-3");
+                    product_card.innerHTML = `
+                <div class="card" id="product${product.id}card">
+                    <div class="card-body">
+                        <h5 class="card-title">${product.name}</h5>
+                        <p class="card-text">
+                            Price: $ ${product.price}
+                        </p>
+                        <button onclick="edit_modal(${product.id})" 
+                        class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#modal">View more</button>
+                    </div>
+                </div>`;
+                    products_cards.insertBefore(product_card, products_cards.firstChild);
+                }
+            });
+    }
+
+    const edit_modal = (product_id) => {
+        document.querySelector("#modal_product_id").innerHTML = product_id;
+
+        fetch(`${url}${product_id}`)
+            .then((response) => response.json())
+            .then((product) => {
+                modal_title.innerHTML = product.name;
+                name_modal_field.value = product.name;
+                description_modal_field.value = product.description;
+                price_modal_field.value = product.price;
+            });
+    }
+
+    const create_product = (product_id) => {
+        const form = document.querySelector("#new_form");
+        if (!form.checkValidity()) {
+            return;
+        }
+        const name = name_field.value;
+        const description = description_field.value;
+        const price = price_field.value;
+        fetch(`${url}`, {
+            method: 'POST',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify({
+                'name': name,
+                'description': description,
+                'price': price,
+            }),
+        })
+            .then((response) => response.json())
+            .then((product) => {
+                create_cards();
+            });
+
+        name_field.value = "";
+        description_field.value = "";
+        price_field.value = "";
+        const new_product_button = document.querySelector("#new_product_button");
+        new_product_button.click();
+    }
+
+    const edit_product = () => {
+        const product_id = document.querySelector("#modal_product_id").innerHTML;
+        const form = document.querySelector("#modal_form");
+        if (!form.checkValidity()) {
+            return;
+        }
+        const name = name_modal_field.value;
+        const description = description_modal_field.value;
+        const price = price_modal_field.value;
+
+        fetch(`${url}${product_id}`, {
+            method: 'PATCH',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify({
+                'name': name,
+                'description': description,
+                'price': price,
+            }),
+        })
+            .then((response) => response.json())
+            .then((product) => {
+                create_cards();
+            });
+
+    }
+
+    const delete_product = () => {
+        const product_id = document.querySelector("#modal_product_id").innerHTML;
+        const card = document.querySelector(`#product${product_id}card`);
+        fetch(`${url}${product_id}`, {
+            method: 'DELETE',
+        })
+            .then((response) => response.json())
+            .then((product) => {
+                create_cards();
+            });
+    }
+
+    create_cards();
+
+</script>
+{% endblock scripts %}
