@@ -557,7 +557,7 @@ class MarketplaceAPI(MethodView):
         if Marketplace.query.filter_by(name=name).first():
             return {"ERROR": "Marketplace name already registered"}, 400
 
-        marketplace = Seller(
+        marketplace = Marketplace(
             name=name,
             description=description,
             email=email,
@@ -575,7 +575,7 @@ class MarketplaceAPI(MethodView):
         return {"id": marketplace.id, "name": marketplace.name}
 
     def patch(self, marketplace_id):
-        marketplace = Seller.query.get(marketplace_id)
+        marketplace = Marketplace.query.get(marketplace_id)
         if marketplace is None:
             return {"ERROR": "Marketplace does not exists"}, 400
 
@@ -607,7 +607,7 @@ class MarketplaceAPI(MethodView):
         }
 
     def delete(self, marketplace_id):
-        marketplace = Seller.query.get(marketplace_id)
+        marketplace = Marketplace.query.get(marketplace_id)
         if marketplace is None:
             return {"ERROR": "Marketplace does not exists"}, 400
 
