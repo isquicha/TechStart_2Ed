@@ -136,9 +136,10 @@ class ProductAPI(MethodView):
         if product_id is None:
             products = []
 
-            body = request.get_json()
-            if body is not None:
+            body = request.args
+            if len(body) > 0:
                 name = body.get("name", "")
+                print(f"x{name}x")
                 description = body.get("description", "")
 
                 categories_list = body.get("categories", [])
@@ -146,13 +147,19 @@ class ProductAPI(MethodView):
                     Category.id.in_(categories_list)
                 ).all()
 
-                filtered_products = Product.query.join(
-                    Product.categories
-                ).filter(
-                    Category.id.in_([x.id for x in categories]),
-                    Product.name.like(f"%{name}%"),
-                    Product.description.like(f"%{description}%"),
-                )
+                if len(categories) > 0:
+                    filtered_products = Product.query.join(
+                        Product.categories
+                    ).filter(
+                        Category.id.in_([x.id for x in categories]),
+                        Product.name.like(f"%{name}%"),
+                        Product.description.like(f"%{description}%"),
+                    )
+                else:
+                    filtered_products = Product.query.filter(
+                        Product.name.like(f"%{name}%"),
+                        Product.description.like(f"%{description}%"),
+                    )
 
                 try:
                     price = float(body.get("price"))
@@ -163,6 +170,7 @@ class ProductAPI(MethodView):
                     pass
 
                 filtered_products = filtered_products.all()
+                print(f"z{filtered_products}x")
             else:
                 filtered_products = Product.query.all()
 
